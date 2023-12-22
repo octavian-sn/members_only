@@ -7,8 +7,12 @@ router.get('/', function(req, res, next) {
 });
 
 // Sign-up page
-router.get('/sign-up', function(req, res, next){
-  res.render('sign-up', {title: 'Sign-up'});
+router.get('/register', function(req, res, next){
+  res.render('register', {title: 'Register'});
+})
+
+router.post('/register', function(req, res, next){
+  res.render('register', {title: 'Register'});
 })
 
 module.exports = router;
