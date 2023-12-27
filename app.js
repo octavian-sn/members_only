@@ -1,20 +1,21 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 const User = require("./models/user");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 
-var indexRouter = require('./routes/index');
-var registerRouter = require('./routes/register');
-var logoutRouter = require('./routes/logout');
+const indexRouter = require('./routes/index');
+const registerRouter = require('./routes/register');
+const logoutRouter = require('./routes/logout');
+const loginRouter = require('./routes/login');
 require('dotenv').config();
 
-var app = express();
+const app = express();
 
 // Set up mongoose connection
 const mongoose = require("mongoose");
@@ -72,6 +73,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use('/', indexRouter);
 app.use('/register', registerRouter);
+app.use('/login', loginRouter);
 app.use('/logout', logoutRouter);
 
 // catch 404 and forward to error handler
