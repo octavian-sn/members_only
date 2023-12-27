@@ -4,6 +4,7 @@ const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
 
 // GET Register
 router.get('/', function(req, res, next){
@@ -77,7 +78,13 @@ router.post('/', [
         });
 
         await user.save();
-        res.redirect("/");
+        
+        req.login(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+          return res.redirect("/");
+        });
 
       } catch(error) {
 
