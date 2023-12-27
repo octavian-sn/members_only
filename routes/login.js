@@ -10,8 +10,6 @@ router.get('/', function (req, res, next) {
 router.post('/', function(req, res, next) {
     passport.authenticate("local", function(err, user, info) {
         if (!user) {
-            console.log('user')
-            // Redirect to the login form with errors and previous data
             return res.render('login', {
                 title: 'Login',
                 message: 'Invalid username or password',
