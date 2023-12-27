@@ -3,6 +3,7 @@ var router = express.Router();
 const User = require("../models/user");
 const { body, validationResult } = require("express-validator");
 const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
 
 // GET Register
 router.get('/', function(req, res, next){
@@ -23,6 +24,7 @@ router.post('/', [
       if (existingUser) {
           throw new Error('Username already in use.');
       }
+      return true;
     }),
   body("first_name")
     .trim()
@@ -36,34 +38,52 @@ router.post('/', [
     .isLength({ max: 50 }).withMessage("Last name cannot be longer than 15 characters.")
     .escape()
     .isAlphanumeric().withMessage("Last name has non-alphanumeric characters."),
+  body("password")
+    .isLength({ min: 10 }).withMessage("Password must contain at least 10 characters."),
+  body("confirm_password")
+    .custom((value, { req }) => {
+        if (value !== req.body.password) {
+            throw new Error("Passwords do not match.");
+        }
+        return true;
+    }),
 
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
-    // Extract the validation errors from a request.
+    const { confirm_password, ...userData } = req.body;
+
     const errors = validationResult(req);
 
-    // Create Author object with escaped and trimmed data
-    const user = new User({
-      username: req.body.username,
-      first_name: req.body.first_name,
-      last_name: req.body.last_name,
-      password: req.body.password,
-      membership_status: "user",
-    });
-
+    // Check for errors and render the form again or save the user and redirect to Homepage
     if (!errors.isEmpty()) {
-      // There are errors. Render form again with sanitized values/errors messages.
       res.render("register", {
         title: "Register",
-        user,
+        user:{
+          ...userData,
+          confirm_password
+        },
         errors: errors.array(),
       });
+
       return;
     } else {
-      // Data form is valid, save the user in the DB.
-      await user.save();
-      // Redirect to homepage.
-      res.redirect("/");
+      try{
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+        const user = new User({
+          ...userData,
+          password: hashedPassword,
+          membership_status: "user",
+        });
+
+        await user.save();
+        res.redirect("/");
+
+      } catch(error) {
+
+        res.render("error", { message: "An error occurred while saving the user.", error });
+
+      }
     }
   }),
 ])
