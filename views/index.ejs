@@ -8,7 +8,7 @@
     </ul>
   <% } %>
   <% if(currentUser && currentUser.membership_status === "member") {%>
-    <form class="max-w-lg w-full mx-auto" method="POST" action="">
+    <form class="mb-5 max-w-lg w-full mx-auto" method="POST" action="">
       <input 
         type="text" 
         id="title" 
@@ -31,5 +31,48 @@
       </button>
     </form>
   <% } %>
+
+  <% if(!currentUser) {%>
+    <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+      <a href="/login" class="underline font-medium">Login</a> and become a <span class="font-medium">Club Member</span> to view private information and add messages.
+    </div>
+  <% } %>
+
+  <% if(typeof(messages) !== "undefined" && messages.length > 0) {%>
+    <% messages.forEach(message =>{ %>
+      <div class="mb-4 flex flex-col min-w-[420px] leading-1.5 p-4 border-gray-200 bg-gray-200 rounded-e-xl rounded-es-xl dark:bg-gray-700">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-sm font-semibold text-gray-900 dark:text-white"><%= message.title %></span>
+            <span class="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+              <% if (currentUser && currentUser.membership_status === "member") { %>
+                <%= message.formattedTime %>
+              <% } else { %>
+                Time
+              <% } %>
+            </span>
+          </div>
+          <span class="text-sm font-normal text-gray-500 dark:text-gray-400 ml-auto">
+            <% if (currentUser && currentUser.membership_status === "member") { %>
+              <%= message.formattedDate %>
+            <% } else { %>
+              Date
+            <% } %>
+          </span>
+        </div>
+        <p class="text-sm font-normal py-2.5 text-gray-900 dark:text-white"><%= message.text %></p>
+        <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+          <% if (currentUser && currentUser.membership_status === "member") { %>
+            <%= message.user.name %>
+          <% } else { %>
+            Club Member
+          <% } %>
+        </span>
+      </div>
+      
+    <% }); %>
+  <%} else {%>
+    <h3>No messages yet.</h3>
+  <% }; %>
 
 <%- include('footer') -%>

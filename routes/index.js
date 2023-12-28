@@ -5,29 +5,31 @@ const { body, validationResult } = require("express-validator");
 const Message = require("../models/message");
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Message Board' });
+router.get('/', async function(req, res, next) {
+  const messages = (await Message.find().populate("user")).reverse();
+
+  res.render('index', { title: 'Message Board', messages});
 });
 
 router.post('/', [
   body("title")
     .trim()
     .isLength({ min: 1 }).withMessage("Title is required.")
-    .isLength({ max: 150 }).withMessage("Title cannot be longer than 150 characters.")
-    .escape(),
+    .isLength({ max: 150 }).withMessage("Title cannot be longer than 150 characters."),
   body("message")
-    .trim()
-    .escape(),
+    .trim(),
 
   asyncHandler(async (req, res, next)=> {
     const errors = validationResult(req);
 
     if(!errors.isEmpty()){
+      const messages = (await Message.find().populate("user")).reverse();
       res.render('index', {
         title: 'Message Board',
         message: req.body.message,
         message_title: req.body.title,
         errors: errors.array(),
+        messages
       })
       return;
     } else {
@@ -40,9 +42,9 @@ router.post('/', [
         await message.save();
 
         res.redirect("/");
-      }catch(error){
+      } catch(error) {
 
-        res.render("error", { message: "An error occurred while saving the user.", error });
+        res.render("error", { message: "An error occurred while saving the message.", error });
 
       }
     }
