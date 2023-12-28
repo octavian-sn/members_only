@@ -1,5 +1,35 @@
 <%- include('header') -%>
 
-    <h1 class="text-blue-600">Hello and wellcome!</h1>
+  <% if(locals.errors) { %>
+    <ul>
+        <% for(let i = 0; i < errors.length; i++) { %>
+        <li><%= errors[i].msg %></li>
+        <% } %>
+    </ul>
+  <% } %>
+  <% if(currentUser && currentUser.membership_status === "member") {%>
+    <form class="max-w-lg w-full mx-auto" method="POST" action="">
+      <input 
+        type="text" 
+        id="title" 
+        class="mb-2 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+        placeholder="Title" 
+        name="title"
+        value="<%= (typeof message_title !== 'undefined' ? message_title : '') %>"
+        />
+      <textarea 
+        id="message" 
+        rows="4"
+        name="message"
+        value="<%= (typeof message !== 'undefined' ? message : '') %>"
+        class="mb-4 block p-2.5 w-full text-sm text-gray-900  rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        placeholder="Add a message to the board..."></textarea>
+      <button 
+        type="submit"
+        class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900 hover:bg-blue-800">
+        Publish message
+      </button>
+    </form>
+  <% } %>
 
 <%- include('footer') -%>
